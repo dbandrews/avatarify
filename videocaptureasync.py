@@ -11,8 +11,9 @@ WARMUP_TIMEOUT = 10.0
 class VideoCaptureAsync:
     def __init__(self, src=0, width=640, height=480):
         
-        #Use IP camera hard coded
-        self.src = 'http://192.168.0.6:8080/video'
+        # #Use IP camera hard coded
+        self.src = 'http://192.168.0.6:4747/video'
+        # self.src = src
 
         self.cap = cv2.VideoCapture(self.src)
         if not self.cap.isOpened():
