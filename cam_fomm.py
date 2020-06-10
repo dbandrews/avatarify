@@ -28,6 +28,9 @@ if _platform == 'linux' or _platform == 'linux2':
     import pyfakewebcam
     _streaming = True
 
+#Resolution of input,output image. Larger than 256 difficult to not have latency issues
+res = 256
+
 
 def load_checkpoints(config_path, checkpoint_path, device='cuda'):
 
@@ -113,7 +116,7 @@ def crop(img, p=0.7):
 
 def pad_img(img, orig):
     h, w = orig.shape[:2]
-    pad = int(512 * (w / h) - 512)
+    pad = int(res * (w / h) - res)
     out = np.pad(img, [[0,0], [pad//2, pad//2], [0,0]], 'constant')
     out = cv2.resize(out, (w, h))
     return out
@@ -154,7 +157,7 @@ def load_stylegan_avatar():
     image = cv2.imdecode(image, cv2.IMREAD_COLOR)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    image = resize(image, (512, 512))
+    image = resize(image, (res, res))
 
     return image
 
@@ -209,7 +212,7 @@ if __name__ == "__main__":
             img = imageio.imread(f)
             if img.ndim == 2:
                 img = np.tile(img[..., None], [1, 1, 3])
-            img = resize(img, (512, 512))[..., :3]
+            img = resize(img, (res, res))[..., :3]
             avatars.append(img)
     
     log('load checkpoints..')
@@ -260,7 +263,7 @@ if __name__ == "__main__":
 
         frame, lrud = crop(frame, p=frame_proportion)
         # frame = resize(frame, (256, 256))[..., :3]
-        frame = resize(frame, (512, 512))[..., :3]
+        frame = resize(frame, (res, res))[..., :3]
 
         if find_keyframe:
             if is_new_frame_better(fa, avatar, frame, device):
