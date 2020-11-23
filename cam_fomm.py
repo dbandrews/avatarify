@@ -18,6 +18,9 @@ from modules.keypoint_detector import KPDetector
 from animate import normalize_kp
 from scipy.spatial import ConvexHull
 
+# Super res requirements
+import cv2
+
 import face_alignment
 
 from videocaptureasync import VideoCaptureAsync
@@ -31,6 +34,31 @@ if _platform == 'linux' or _platform == 'linux2':
 #Resolution of input,output image. Larger than 256 difficult to not have latency issues
 res = 256
 
+def load_res_model(model_path = "super_res_models/ESPCN_x4.pb"):
+    """
+    Reads in a super resolution model for OpenCV
+
+    Parameters
+    ----------
+    model_path: string
+        Path to super resolution compatible model in the OpenCV super res module
+
+    Returns
+    -------
+    sr: Super Resolution object for upscaling later images by factor of 4
+    """
+    
+    modelName = model_path.split(os.path.sep)[-1].split("_")[0].lower()
+    modelScale = model_path.split("_x")[-1]
+    modelScale = int(modelScale[:modelScale.find(".")]) 
+
+    sr = cv2.dnn_superres.DnnSuperResImpl_create()
+    sr.readModel(model_path)
+    modelScale = 4
+
+    sr.setModel(modelName, modelScale)
+
+    return sr
 
 def load_checkpoints(config_path, checkpoint_path, device='cuda'):
 
@@ -371,7 +399,13 @@ if __name__ == "__main__":
             preview_frame = cv2.putText(preview_frame, fps_string, (10, 240), 0, 0.5, (255, 255, 255), 1)
 
         cv2.imshow('cam', preview_frame)
-        cv2.imshow('avatarify', out[..., ::-1])
+
+        # Superresolution!
+        sr = load_res_model(model_path = "super_res_models\\ESPCN_x4.pb")
+        upscale = sr.upsample(out[..., ::-1])
+
+        # cv2.imshow('avatarify', out[..., ::-1])
+        cv2.imshow('avatarify', upscale)
 
         if opt.verbose:
             postproc_time = (time.time() - postproc_start) * 1000

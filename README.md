@@ -247,3 +247,14 @@ Please make pull requests if you have any improvements or bug-fixes.
 * `pipe:0: Invalid data found when processing input`: Make sure `CAMID` in `scripts/settings.sh` is correct. Use `v4l2-ctl --list-devices` to query available devices.
 * `ASSERT: "false" in file qasciikey.cpp, line 501`. If you have several keyboard layouts, switch to English layout.
 * `No such file or directory: 'vox-adv-cpk.pth.tar'`. Please follow instructions [Download network weights](#download-network-weights)
+
+
+## Dustin Super Resolution Notes
+
+1. Install `opencv-contrib-python` into avatarify conda environment
+
+    `pip install opencv-contrib-python`
+
+2. Get pretrained model file and place into `super_res_models`
+
+    https://github.com/fannymonori/TF-ESPCN/blob/master/export/ESPCN_x4.pb
